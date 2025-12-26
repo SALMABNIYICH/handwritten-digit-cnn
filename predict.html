@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Tester le modèle - Interface AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* ========== VARIABLES ========== */
+        :root{
+            --neon-blue: #00f0ff;
+            --neon-pink: #ff00ff;
+            --bg-dark: #030409;
+            --section-bg: rgba(12, 13, 27, 0.85);
+            --text-main: #E0E0FF;
+            --text-sub: #b0b0d6;
+        }
+
+        /* ========== GLOBAL ========== */
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.6;
+            text-align: center;
+            overflow-x: hidden;
+        }
+        ::selection { background: var(--neon-blue); color: #000; }
+
+        /* ========== BACKGROUND CANVAS ========== */
+        #bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            display: block;
+        }
+
+        /* ========== HEADER ========== */
+        h1 {
+            font-size: 2.2em;
+            font-weight: 800;
+            color: var(--neon-blue);
+            text-shadow: 0 0 8px var(--neon-blue), 0 0 15px rgba(0, 240, 255, 0.5);
+            padding: 40px 0 20px;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ========== MODE BUTTONS ========== */
+        .mode-btn-container {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #1a1c34;
+            padding-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        .mode-btn {
+            margin: 0 15px;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid var(--neon-pink);
+            background-color: transparent;
+            color: var(--text-main);
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+        .mode-btn:hover { border-color: var(--neon-blue); color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 240, 255, 0.4); }
+        .mode-btn.active {
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+            color: #0c0d1b;
+            border: none;
+            box-shadow: 0 0 15px var(--neon-blue), 0 0 20px var(--neon-pink);
+        }
+
+        /* ========== SECTIONS ========== */
+        .mode-section {
+            margin: 20px auto;
+            padding: 30px;
+            max-width: 600px;
+            background-color: var(--section-bg);
+            border-radius: 12px;
+            border: 1px solid #1a1c34;
+            box-shadow: 0 0 15px rgba(93, 0, 255, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ========== CANVAS & VIDEO ========== */
+        canvas {
+            border: 3px solid var(--neon-blue);
+            border-radius: 8px;
+            background: #000;
+            cursor: crosshair;
+            box-shadow: 0 0 15px var(--neon-blue);
+            display: block;
+            margin: 10px auto 20px;
+        }
+        video {
+            border: 3px solid var(--neon-pink);
+            border-radius: 8px;
+            background: #000;
+            box-shadow: 0 0 15px var(--neon-pink);
+            display: block;
+            margin: 10px auto 20px;
+        }
+        img {
+            border: 3px solid var(--neon-pink);
+            border-radius: 8px;
+            box-shadow: 0 0 15px var(--neon-pink);
+            transition: 0.3s;
+        }
+        img:hover { box-shadow: 0 0 30px var(--neon-pink); }
+
+        /* ========== INPUTS ========== */
+        /* ========== INPUTS ========== */
+input[type="file"] {
+    background-color: #1a1c34;
+    color: var(--neon-blue);
+    border: 1px solid var(--neon-pink);
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+/* Chrome / Edge / Safari */
+input[type="file"]::-webkit-file-upload-button {
+    visibility: visible;
+    padding: 8px 15px;
+    background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+    color: #0c0d1b;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+/* Firefox */
+input[type="file"]::file-selector-button {
+    padding: 8px 15px;
+    background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+    color: #0c0d1b;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+
+        /* ========== RESULTS ========== */
+        .prediction-result {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #39FF14;
+            text-shadow: 0 0 10px rgba(57, 255, 20, 0.8);
+            margin-top: 15px;
+        }
+        #canvasResult, #cameraResult {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px rgba(0, 240, 255, 0.6);
+        }
+
+        /* ========== BUTTONS ========== */
+        .btn {
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin: 10px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            cursor: pointer;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue));
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(93, 0, 255, 0.4);
+            border: none;
+        }
+        .btn:hover { box-shadow: 0 8px 25px rgba(0, 240, 255, 0.6); transform: translateY(-2px); }
+        .btn-secondary {
+            background-color: transparent;
+            color: #9d9dff;
+            border: 2px solid #9d9dff;
+            box-shadow: 0 0 5px rgba(157, 157, 255, 0.4);
+        }
+        .btn-secondary:hover { background-color: rgba(93,0,255,0.2); color:#fff; border-color:#fff; }
+    </style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<h1>🔍 Interface de Test du Modèle</h1>
+
+<div class="mode-btn-container">
+    <button class="mode-btn active" onclick="showMode('upload', this)">Télécharger (Upload)</button>
+    <button class="mode-btn" onclick="showMode('draw', this)">Dessiner (Draw)</button>
+    <button class="mode-btn" onclick="showMode('camera', this)">Scanner (Live Scan)</button>
+</div>
+
+<div id="upload" class="mode-section">
+    <form action="/predict" method="POST" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required><br><br>
+        <button type="submit" class="btn">Prédire l'image</button>
+    </form>
+    {% if file_path %}
+    <div style="margin-top:25px;">
+        <img src="{{ file_path }}" width="200" alt="Image téléchargée à analyser">
+        <p class="prediction-result">
+            Le modèle prédit : {{ prediction }} (Confiance : {{ confidence }}%)
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+<div id="draw" class="mode-section" style="display:none;">
+    <p class="description" style="color:var(--text-sub); font-size: 0.9em; margin-bottom: 20px;">
+        Dessinez un chiffre (0-9) en **Blanc** sur la grille **Noire** (280x280 pixels).
+    </p>
+    <canvas id="canvas" width="280" height="280"></canvas><br>
+    <!-- Updated button to match Prédire l'image style -->
+    <button onclick="clearCanvas()" class="btn">Effacer la grille</button>
+    <button onclick="submitDrawing()" class="btn">Analyser le dessin</button>
+    <div id="canvasResult" class="prediction-result" style="margin-top:20px;"></div>
+</div>
+
+<div id="camera" class="mode-section" style="display:none;">
+    <p class="description" style="color:var(--text-sub); font-size: 0.9em; margin-bottom: 20px;">
+        Orientez votre caméra vers un chiffre manuscrit (doit être clair et centré).
+    </p>
+    <video id="video" width="280" height="280" autoplay></video><br>
+    <button onclick="captureCamera()" class="btn">Capturer et prédire</button>
+    <canvas id="cameraCanvas" width="28" height="28" style="display:none;"></canvas>
+    <div id="cameraResult" class="prediction-result" style="margin-top:20px;"></div>
+</div>
+
+<br>
+<!-- Updated Retour button to match Prédire l'image style -->
+<a href="/" class="btn" style="margin-top: 40px;">⬅ Retour à l'accueil</a>
+
+<script>
+// ========== MODE SWITCH ==========
+function showMode(mode, btn){
+    document.querySelectorAll('.mode-section').forEach(s=>s.style.display='none');
+    document.getElementById(mode).style.display='block';
+    document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+// ========== DRAWING ==========
+const canvas=document.getElementById('canvas');
+const ctx=canvas.getContext('2d');
+ctx.fillStyle="black"; ctx.fillRect(0,0,canvas.width,canvas.height);
+ctx.strokeStyle="white"; ctx.lineWidth=15; ctx.lineCap='round';
+let drawing=false,lastX=0,lastY=0;
+
+canvas.addEventListener('mousedown', e=>{ drawing=true; const r=canvas.getBoundingClientRect(); lastX=e.clientX-r.left; lastY=e.clientY-r.top; });
+canvas.addEventListener('mouseup', ()=>drawing=false);
+canvas.addEventListener('mouseleave', ()=>drawing=false);
+canvas.addEventListener('mousemove', e=>{
+    if(!drawing) return;
+    const r=canvas.getBoundingClientRect();
+    const x=e.clientX-r.left; const y=e.clientY-r.top;
+    ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(x,y); ctx.stroke();
+    lastX=x; lastY=y;
+});
+
+function clearCanvas(){ ctx.fillStyle="black"; ctx.fillRect(0,0,canvas.width,canvas.height); document.getElementById('canvasResult').innerHTML=''; }
+
+function submitDrawing(){
+    const tempCanvas=document.createElement('canvas');
+    tempCanvas.width=28; tempCanvas.height=28;
+    const tempCtx=tempCanvas.getContext('2d');
+    tempCtx.drawImage(canvas,0,0,28,28);
+    const dataURL=tempCanvas.toDataURL("image/png");
+    sendImageToServer(dataURL,'canvasResult');
+}
+
+// ========== CAMERA ==========
+const video=document.getElementById('video');
+if(navigator.mediaDevices.getUserMedia){
+    navigator.mediaDevices.getUserMedia({video:true}).then(s=>video.srcObject=s).catch(err=>console.error(err));
+}
+function captureCamera(){
+    const cameraCanvas=document.getElementById('cameraCanvas');
+    const cameraCtx=cameraCanvas.getContext('2d');
+    cameraCtx.drawImage(video,0,0,video.width,video.height,0,0,28,28);
+    sendImageToServer(cameraCanvas.toDataURL("image/png"),'cameraResult');
+}
+
+// ========== SEND TO SERVER ==========
+function sendImageToServer(dataURL,resultDivId){
+    document.getElementById(resultDivId).innerHTML='<span style="color:var(--neon-blue);">Analyse en cours...</span>';
+    fetch("{{ url_for('predict') }}",{ method:"POST", body: JSON.stringify({imageBase64:dataURL}), headers: {"Content-Type":"application/json"} })
+    .then(res=>res.json())
+    .then(data=>{
+        document.getElementById(resultDivId).innerHTML=`<span style="color:#39FF14;text-shadow:0 0 8px rgba(57,255,20,0.8)">Le modèle prédit : ${data.prediction} (Confiance : ${data.confidence}%)</span>`;
+    }).catch(err=>{
+        console.error(err);
+        document.getElementById(resultDivId).innerHTML=`<span style="color:#FF3366;text-shadow:0 0 8px rgba(255,51,102,0.8)">[ERREUR] Impossible de joindre le serveur.</span>`;
+    });
+}
+
+// ========== BACKGROUND PARTICLES ==========
+const canvasBG = document.getElementById('bg');
+const ctxBG = canvasBG.getContext('2d');
+canvasBG.width = window.innerWidth;
+canvasBG.height = window.innerHeight;
+
+const particles=[];
+for(let i=0;i<180;i++){
+    particles.push({
+        x: Math.random()*canvasBG.width,
+        y: Math.random()*canvasBG.height,
+        r: Math.random()*2+1,
+        dx: (Math.random()-0.5)*0.5,
+        dy: (Math.random()-0.5)*0.5,
+        color: Math.random()<0.5 ? '#ff00ff' : '#00f0ff'
+    });
+}
+
+function animateBG(){
+    ctxBG.fillStyle='rgba(0,0,0,0.15)';
+    ctxBG.fillRect(0,0,canvasBG.width,canvasBG.height);
+    particles.forEach(p=>{
+        ctxBG.beginPath();
+        ctxBG.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctxBG.fillStyle=p.color;
+        ctxBG.fill();
+        p.x+=p.dx; p.y+=p.dy;
+        if(p.x<0||p.x>canvasBG.width) p.dx*=-1;
+        if(p.y<0||p.y>canvasBG.height) p.dy*=-1;
+    });
+    requestAnimationFrame(animateBG);
+}
+animateBG();
+window.addEventListener('resize',()=>{canvasBG.width=window.innerWidth; canvasBG.height=window.innerHeight;});
+
+</script>
+
+</body>
+</html>

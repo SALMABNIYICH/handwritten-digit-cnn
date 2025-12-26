@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MNIST Statistics — Model Evaluation</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root{
+  --bg1:#050012;
+  --neon-pink:#ff00ff;
+  --neon-blue:#00f0ff;
+  --glass-bg: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  font-family:'Orbitron',sans-serif;
+  background: radial-gradient(circle at 30% 20%, #120023 0%, #04000a 60%, #000 100%);
+  color:#e8e6ff;
+}
+header{ text-align:center; padding:40px 20px; }
+h1{ color:var(--neon-pink); text-shadow:0 0 12px var(--neon-pink),0 0 35px var(--neon-blue); }
+.section{
+  max-width:1000px; margin:30px auto; padding:30px;
+  border-radius:18px; background:var(--glass-bg);
+  border:1px solid rgba(255,255,255,0.08); backdrop-filter: blur(10px);
+  box-shadow:0 0 50px rgba(0,0,0,0.6);
+}
+.section h2{ margin-top:0; color:var(--neon-blue); }
+.metrics-grid{
+  display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  gap:20px; margin-top:20px;
+}
+.metric-card{
+  padding:25px; border-radius:14px; background:rgba(0,0,0,0.4);
+  text-align:center; box-shadow:0 0 20px rgba(0,240,255,0.15);
+}
+.metric-card h3{ margin:0; color:#aaa; font-size:0.9em; }
+.metric-card p{ font-size:2em; margin:10px 0 0; color:var(--neon-pink); }
+canvas{ margin-top:20px; }
+.interpretation{ font-size:0.9em; color:#cfcaf5; margin-top:15px; line-height:1.6; }
+img.confusion-matrix{ width:100%; max-width:600px; display:block; margin:20px auto; border-radius:12px; box-shadow:0 0 20px rgba(0,240,255,0.3); }
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>📊 Model Statistics & Evaluation</h1>
+  <p>Analyse complète des performances du CNN sur MNIST</p>
+</header>
+
+<!-- GLOBAL METRICS -->
+<section class="section">
+  <h2>🔢 Global Performance</h2>
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <h3>Accuracy</h3>
+      <p>{{ accuracy }}%</p>
+    </div>
+    <div class="metric-card">
+      <h3>Loss</h3>
+      <p>{{ loss }}</p>
+    </div>
+  </div>
+  <div class="interpretation">
+    Ces métriques montrent la performance globale du modèle sur les données de test.
+    Une accuracy proche de 99% indique une excellente capacité de généralisation.
+  </div>
+</section>
+
+<!-- PER DIGIT METRICS -->
+<section class="section">
+  <h2>🎯 Precision, Recall & F1-score par chiffre</h2>
+  <canvas id="classMetricsChart"></canvas>
+  <div class="interpretation">
+    Chaque chiffre (0–9) est évalué individuellement afin d’identifier
+    les classes les plus difficiles à reconnaître.
+  </div>
+</section>
+
+<!-- CONFUSION MATRIX -->
+<section class="section">
+  <h2>🧩 Confusion Matrix</h2>
+  <img src="{{ url_for('static', filename='matrix.png') }}" alt="Confusion Matrix" class="confusion-matrix">
+  <div class="interpretation">
+    La matrice de confusion montre où le modèle se trompe.
+    Les valeurs plus foncées indiquent plus de prédictions correctes pour chaque chiffre.
+  </div>
+</section>
+
+<script>
+const classData = {{ classification_data | tojson }};
+
+/* Per digit metrics */
+new Chart(document.getElementById('classMetricsChart'), {
+  type: 'bar',
+  data: {
+    labels: classData.labels,
+    datasets: [
+      {label:'Precision', data: classData.precision, backgroundColor:'#ff00ff'},
+      {label:'Recall', data: classData.recall, backgroundColor:'#00f0ff'},
+      {label:'F1-score', data: classData.f1score, backgroundColor:'#ff88ff'}
+    ]
+  },
+  options: { responsive:true, scales:{y:{beginAtZero:true, max:1}} }
+});
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+

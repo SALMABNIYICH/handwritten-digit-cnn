@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MNIST Digit Recognition — Neon Cyberpunk</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+/* ========== VARIABLES ========== */
+:root{
+  --bg1:#050012;
+  --neon-pink:#ff00ff;
+  --neon-blue:#00f0ff;
+  --glass-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+}
+
+/* ========== GLOBAL ========== */
+*{box-sizing:border-box}
+html,body{height:100%; margin:0; font-family:'Orbitron',sans-serif; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+body{
+  background: radial-gradient(circle at 30% 20%, #120023 0%, #04000a 60%, #000 100%);
+  color:#e8e6ff;
+  overflow:hidden;
+  position:relative;
+}
+
+/* ========== BACKGROUND CANVAS ========== */
+#bg { position:fixed; inset:0; z-index:0; display:block; }
+
+/* ========== HEADER ========== */
+.futuristic-header{
+  position:relative; z-index:2;
+  text-align:center; padding:40px 5%;
+}
+.main-title{
+  font-size:2.5em; font-weight:800; color:var(--neon-pink);
+  text-shadow:0 0 10px var(--neon-pink), 0 0 40px var(--neon-blue);
+  letter-spacing:2px;
+  animation: neonFlicker 2.5s infinite alternate;
+}
+.subtitle{ color:#bcb7df; margin:4px 0 0; font-size:1.2em; }
+
+/* ========== GLASS PANEL (CONTENT) ========== */
+.glass-panel{
+  position:relative; z-index:2;
+  max-width:800px; margin:40px auto; padding:30px;
+  border-radius:16px;
+  background: var(--glass-bg);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow:
+    0 8px 40px rgba(0,0,0,0.6),
+    0 0 35px rgba(255,0,255,0.08),
+    0 0 80px rgba(0,240,255,0.06);
+  backdrop-filter: blur(10px) saturate(140%);
+}
+
+/* ========== NEON FLICKER ========== */
+@keyframes neonFlicker {
+  0%,100%{ text-shadow:0 0 10px #ff00ff,0 0 40px #00f0ff; }
+  25%{ text-shadow:0 0 15px #ff00ff,0 0 50px #00f0ff; }
+  50%{ text-shadow:0 0 12px #ff00ff,0 0 45px #00f0ff; }
+  75%{ text-shadow:0 0 18px #ff00ff,0 0 55px #00f0ff; }
+}
+
+/* ========== BUTTONS ========== */
+.btn{
+  text-decoration:none; padding:12px 25px; border-radius:25px; font-weight:600;
+  text-transform:uppercase; display:inline-block;
+  margin:10px; cursor:pointer;
+}
+.primary-btn{
+  background: linear-gradient(90deg,var(--neon-pink),var(--neon-blue));
+  color:#000; border:none;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6),0 0 18px rgba(255,0,255,0.06);
+  animation: buttonGlow 4s ease infinite;
+}
+.secondary-btn{
+  background-color:transparent; color:var(--neon-blue); border:2px solid var(--neon-pink);
+  box-shadow: 0 0 10px rgba(0,255,255,0.4);
+}
+@keyframes buttonGlow{
+  0%{ background-position:0% 50%; } 50%{ background-position:100% 50%; } 100%{ background-position:0% 50%; }
+}
+
+/* ========== MEDIA ========== */
+@media(max-width:600px){
+  .glass-panel{ margin:20px; padding:20px; }
+  .main-title{ font-size:1.8em; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg" role="img" aria-label="Animated neon background"></canvas>
+
+<header class="futuristic-header">
+  <h1 class="main-title">🖥️ MNIST Digit Recognition</h1>
+  <p class="subtitle">Bienvenue sur l'interface de notre réseau de neurones</p>
+</header>
+
+<section class="glass-panel">
+  <div class="home-action-container">
+    <a href="/explain" class="btn primary-btn">📘 Comprendre le modèle</a>
+    <a href="/predict" class="btn secondary-btn">🔍 Tester le modèle en direct</a>
+    <a href="/statistics" class="btn secondary-btn">📊 Statistiques du modèle</a>
+  </div>
+</section>
+
+<script src="app.js" type="module"></script>
+<script>
+/* ========== SIMPLE CANVAS ANIMATION (JUSTIN ROSS STYLE) ========== */
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const particles = [];
+for(let i=0;i<120;i++){
+  particles.push({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    r:Math.random()*2+1,
+    dx:(Math.random()-0.5)*0.3,
+    dy:(Math.random()-0.5)*0.3
+  });
+}
+function animate(){
+  ctx.fillStyle='rgba(0,0,0,0.15)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle='rgba(0,240,255,0.6)';
+    ctx.fill();
+    p.x += p.dx;
+    p.y += p.dy;
+    if(p.x<0||p.x>canvas.width) p.dx*=-1;
+    if(p.y<0||p.y>canvas.height) p.dy*=-1;
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+
+</body>
+</html>

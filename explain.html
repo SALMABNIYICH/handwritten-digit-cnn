@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dataset & Modèle - CNN Projet AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --neon-pink:#ff00ff;
+  --neon-blue:#00f0ff;
+  --bg-dark:#030409;
+  --glass-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+}
+*{box-sizing:border-box;}
+body{
+  font-family: 'Inter', sans-serif;
+  margin:0; padding:0;
+  line-height:1.6;
+  color:#E0E0FF;
+  background:#030409;
+  overflow-x:hidden;
+  position:relative;
+}
+
+/* Background canvas */
+#bg { position:fixed; inset:0; z-index:0; display:block; }
+
+/* Selection effect */
+::selection { background-color: var(--neon-pink); color:#fff; }
+
+/* Header */
+.futuristic-header{
+  position:relative; z-index:2;
+  padding:40px 5%;
+  text-align:center;
+  background: linear-gradient(180deg, rgba(10,10,30,0.9) 0%, rgba(3,4,9,0) 100%);
+  border-bottom: 2px solid var(--neon-pink);
+  margin-bottom:30px;
+}
+.main-title{
+  font-size:2.5em;
+  font-weight:800;
+  color:var(--neon-pink);
+  text-shadow:0 0 10px var(--neon-pink), 0 0 20px var(--neon-blue);
+  animation: neonFlicker 2.5s infinite alternate;
+  margin-bottom:5px;
+}
+.subtitle{ font-size:1.2em; font-weight:400; color:#8c8f99; }
+
+/* Cards */
+.content-container{ max-width:1200px; margin:0 auto; padding:0 20px; position:relative; z-index:2; }
+.section-card{
+  background: var(--glass-bg);
+  border:1px solid rgba(255,0,255,0.1);
+  border-radius:12px;
+  padding:30px;
+  margin-bottom:40px;
+  box-shadow:0 0 25px rgba(255,0,255,0.1),0 0 10px rgba(0,240,255,0.1);
+  transition: transform 0.3s ease;
+}
+.section-card:hover{
+  transform: translateY(-5px);
+  box-shadow:0 15px 40px rgba(255,0,255,0.3),0 0 30px rgba(0,240,255,0.2);
+}
+
+/* Titles & subtitles */
+.section-title{
+  font-size:1.8em;
+  color: var(--neon-blue);
+  border-left:4px solid var(--neon-pink);
+  padding-left:15px;
+  margin-top:0; margin-bottom:20px;
+  text-shadow:0 0 5px rgba(0,240,255,0.5);
+}
+.sub-section-title{
+  font-size:1.3em;
+  color: var(--neon-pink);
+  margin-top:30px; margin-bottom:15px;
+}
+.description{ color:#b0b0d6; }
+
+/* Lists */
+.process-list li, .ordered-steps li{
+  background-color:#1a1c34;
+  padding:12px 20px;
+  margin-bottom:10px;
+  border-radius:6px;
+  box-shadow:0 2px 5px rgba(0,0,0,0.2);
+  border-left:3px solid var(--neon-blue);
+  position:relative;
+}
+.ordered-steps{
+  counter-reset: item;
+  list-style:none;
+  padding-left:0;
+}
+.ordered-steps li{
+  padding-left:50px;
+}
+.ordered-steps li::before{
+  counter-increment: item;
+  content: counter(item);
+  position:absolute;
+  left:10px;
+  top:50%;
+  transform:translateY(-50%);
+  background-color: var(--neon-pink);
+  color:#fff;
+  width:25px; height:25px; text-align:center; line-height:25px;
+  border-radius:50%; font-weight:bold; font-size:0.9em;
+}
+
+/* Code block */
+.code-block{
+  background-color:#000;
+  border:1px solid var(--neon-pink);
+  border-radius:8px;
+  padding:20px;
+  overflow-x:auto;
+  font-family:'Consolas','Monaco',monospace;
+  color:#00FF00;
+  text-shadow:0 0 5px rgba(0,255,0,0.4);
+}
+
+/* Images & gallery */
+.image-center{ text-align:center; margin-top:20px; }
+.diagram-image{
+  max-width:90%;
+  height:auto;
+  display:block;
+  margin:auto;
+  border:2px solid var(--neon-pink);
+  border-radius:8px;
+  box-shadow:0 0 25px rgba(255,0,255,0.5);
+}
+.gallery{ display:flex; flex-wrap:wrap; gap:15px; margin-top:20px; justify-content:center; }
+.digit-sample{
+  width:80px;
+  height:80px;
+  object-fit:cover;
+  border:2px solid var(--neon-pink);
+  border-radius:4px;
+  background-color:#3e3e60;
+  box-shadow:0 0 8px var(--neon-blue);
+  transition: all 0.2s;
+}
+.digit-sample:hover{
+  transform:scale(1.2);
+  border-color: var(--neon-blue);
+}
+
+/* Buttons */
+.btn{
+  text-decoration:none; padding:12px 25px; border-radius:25px; font-weight:600; text-transform:uppercase;
+  margin:0 15px; display:inline-block; transition: all 0.3s ease;
+}
+.primary-btn{
+  background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue));
+  color:#fff; border:none;
+  box-shadow:0 5px 15px rgba(255,0,255,0.4);
+}
+.primary-btn:hover{
+  box-shadow:0 8px 25px rgba(0,240,255,0.6);
+  transform:translateY(-2px);
+}
+.secondary-btn{
+  background-color:transparent;
+  color: var(--neon-blue);
+  border:2px solid var(--neon-pink);
+  box-shadow:0 0 10px rgba(0,240,255,0.4);
+}
+.secondary-btn:hover{
+  background-color: var(--neon-pink);
+  color:#fff;
+  box-shadow:0 0 20px var(--neon-pink);
+  transform:scale(1.05);
+}
+
+/* Flicker animation */
+@keyframes neonFlicker{
+  0%,100%{ text-shadow:0 0 10px var(--neon-pink),0 0 20px var(--neon-blue); }
+  25%{ text-shadow:0 0 15px var(--neon-pink),0 0 30px var(--neon-blue); }
+  50%{ text-shadow:0 0 12px var(--neon-pink),0 0 25px var(--neon-blue); }
+  75%{ text-shadow:0 0 18px var(--neon-pink),0 0 35px var(--neon-blue); }
+}
+
+/* Media Queries */
+@media(max-width:600px){
+  .main-title{ font-size:1.8em; }
+  .digit-sample{ width:60px; height:60px; }
+  .section-card{ padding:20px; }
+  .footer-nav{ display:flex; flex-direction:column; gap:15px; padding-bottom:30px; }
+  .btn{ width:80%; margin:0 auto; }
+}
+</style>
+</head>
+<body>
+<canvas id="bg" role="img" aria-label="Animated neon background"></canvas>
+
+<header class="futuristic-header">
+    <h1 class="main-title"> AI/ML Project // CNN Digit Recognition</h1>
+    <p class="subtitle">📘 Page 1 — Dataset, Prétraitement & Modèle</p>
+</header>
+
+<main class="content-container">
+
+<!-- Dataset Section -->
+<section class="section-card dataset-section">
+<h2 class="section-title">1️⃣ Dataset : MNIST</h2>
+<p class="description">
+MNIST contient <b>70 000 images</b> de chiffres manuscrits (0–9).<br>
+Chaque image est en <b>28×28 pixels</b> en niveaux de gris.<br>
+<span>- 60 000 images pour l'entraînement</span><br>
+<span>- 10 000 images pour le test</span>
+</p>
+<h3 class="sub-section-title">Exemples :</h3>
+<div class="gallery">
+{% for img in images %}
+<img src="{{ img }}" class="digit-sample" alt="Exemple de chiffre manuscrit">
+{% endfor %}
+</div>
+</section>
+
+<!-- Preprocessing Section -->
+<section class="section-card preprocessing-section">
+<h2 class="section-title">2️⃣ Prétraitement</h2>
+<p class="description">Chaque image est transformée pour être exploitée par le CNN :</p>
+<ul class="steps process-list">
+<li><b>Normalisation</b> : pixels 0–255 → 0–1</li>
+<li><b>Reshape</b> : images → (28,28,1)</li>
+<li><b>Conversion</b> : en tableau numérique (numpy)</li>
+</ul>
+</section>
+
+<!-- Model Learning Section -->
+<section class="section-card model-learning-section">
+<h2 class="section-title">3️⃣ Comment le CNN apprend</h2>
+<p class="description">
+Le CNN détecte automatiquement les motifs et apprend à associer ces motifs aux chiffres grâce aux couches suivantes :
+</p>
+<ol class="process-list ordered-steps">
+<li>Convolution : extraction des motifs locaux</li>
+<li>Pooling : réduction de la taille des cartes de caractéristiques</li>
+<li>Flatten + Dense : combine tous les motifs pour décider du chiffre</li>
+<li>Sortie (Softmax) : prédit le chiffre avec la probabilité la plus élevée</li>
+</ol>
+<p class="description">
+Chaque pixel contribue à l'apprentissage et la rétropropagation ajuste les poids pour améliorer la précision.
+</p>
+<div class="image-center">
+<img src="{{ url_for('static', filename='OIP.webp') }}" alt="Diagramme CNN MNIST" class="diagram-image" style="max-width:80%;">
+</div>
+</section>
+
+<!-- Model Structure -->
+<section class="section-card model-structure-section">
+<h2 class="section-title">4️⃣ Structure du CNN</h2>
+<pre class="code-block">
+model = Sequential()
+model.add(Conv2D(32, kernel_size=(3,3), activation='relu', input_shape=(28,28,1)))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Flatten())
+model.add(Dense(128, activation='relu'))
+model.add(Dense(10, activation='softmax'))
+</pre>
+</section>
+
+<!-- CNN Steps Section -->
+<section class="section-card cnn-steps-section">
+<h2 class="section-title">5️⃣ Étapes détaillées du CNN</h2>
+
+<h3 class="sub-section-title">🔹 Convolution</h3>
+<p class="description">La convolution applique des filtres pour détecter les motifs simples (bords, angles). Chaque filtre apprend automatiquement ce qu’il doit détecter.</p>
+<div class="image-center">
+<img src="{{ url_for('static', filename='convolution.jpg') }}" alt="Convolution" class="diagram-image" style="max-width:80%;">
+</div>
+
+<h3 class="sub-section-title">🔹 Max Pooling</h3>
+<p class="description">Le pooling réduit la taille des cartes de caractéristiques tout en gardant l’information importante, rendant le modèle plus robuste.</p>
+<div class="image-center">
+<img src="{{ url_for('static', filename='max pooling.jpeg') }}" alt="Max Pooling" class="diagram-image" style="max-width:80%;">
+</div>
+
+<h3 class="sub-section-title">🔹 Flatten</h3>
+<p class="description">Flatten transforme les cartes 2D en vecteur 1D pour les couches Dense.</p>
+<div class="image-center">
+<img src="{{ url_for('static', filename='flat.png') }}" alt="Flattening" class="diagram-image" style="max-width:80%;">
+</div>
+
+<h3 class="sub-section-title">🔹 Dense</h3>
+<p class="description">Chaque neurone Dense combine les motifs pour décider quel chiffre est le plus probable.</p>
+<div class="image-center">
+<img src="{{ url_for('static', filename='dense layer.png') }}" alt="Dense Layer" class="diagram-image" style="max-width:80%;">
+</div>
+
+<h3 class="sub-section-title">🔹 Sortie (Softmax)</h3>
+<p class="description">La couche finale calcule la probabilité de chaque chiffre et choisit celui avec la probabilité la plus élevée.</p>
+<div class="image-center">
+<img src="{{ url_for('static', filename='softmax.png') }}" alt="Output Softmax" class="diagram-image" style="max-width:80%;">
+</div>
+</section>
+
+<!-- Training Section -->
+<section class="section-card training-section">
+<h2 class="section-title">6️⃣ Entraînement</h2>
+<p class="description">Le CNN a été entraîné sur <b>10 époques</b> avec :</p>
+<ul class="steps process-list">
+<li><b>Loss :</b> sparse_categorical_crossentropy</li>
+<li><b>Optimiseur :</b> Adam</li>
+<li><b>Métrique :</b> accuracy</li>
+</ul>
+<p class="description final-result">La meilleure <b>accuracy obtenue :</b> <b>{{ accuracy }}%</b></p>
+</section>
+
+<div class="footer-nav">
+<a href="/" class="btn primary-btn">⬅ Retour à l'accueil</a>
+<a href="/predict" class="btn secondary-btn">🔍 Tester le modèle en direct</a>
+</div>
+
+</main>
+
+<script>
+const canvas=document.getElementById('bg');
+const ctx=canvas.getContext('2d');
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+const particles=[];
+for(let i=0;i<150;i++){
+  particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2+1,dx:(Math.random()-0.5)*0.4,dy:(Math.random()-0.5)*0.4});
+}
+function animate(){
+  ctx.fillStyle='rgba(0,0,0,0.15)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,0,255,0.6)';
+    ctx.fill();
+    p.x+=p.dx; p.y+=p.dy;
+    if(p.x<0||p.x>canvas.width)p.dx*=-1;
+    if(p.y<0||p.y>canvas.height)p.dy*=-1;
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+window.addEventListener('resize',()=>{canvas.width=window.innerWidth; canvas.height=window.innerHeight;});
+</script>
+
+</body>
+</html>
